@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Récap Tournoi</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #171717;
+      --panel-2: #202020;
+      --text: #ffffff;
+      --muted: #c8c8c8;
+      --accent: #f5f5f5;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .toolbar label {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .toolbar input {
+      background: #101010;
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-width: 180px;
+      outline: none;
+    }
+
+    .toolbar button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #f0f0f0;
+      color: #111;
+    }
+
+    .status {
+      min-height: 22px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: linear-gradient(90deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .card-label {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .card-value {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 800;
+      word-break: break-word;
+      margin-bottom: 10px;
+    }
+
+    .card-subvalue {
+      font-size: 18px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .ranking-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .ranking-left {
+      display: flex;
+      gap: 10px;
+      min-width: 0;
+      align-items: baseline;
+    }
+
+    .ranking-rank {
+      color: var(--muted);
+      font-size: 14px;
+      min-width: 20px;
+    }
+
+    .ranking-name {
+      font-size: 20px;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .ranking-stat {
+      font-size: 18px;
+      color: var(--accent);
+      font-weight: 700;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .meta {
+      margin-top: 24px;
+      background: linear-gradient(90deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .card-value { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <h1>📊 Récap Tournoi</h1>
+      <div class="toolbar">
+        <label for="tournamentId">Tournoi</label>
+        <input id="tournamentId" value="cdf" />
+        <button id="reloadBtn">Charger</button>
+      </div>
+    </div>
+
+    <div id="status" class="status">Prêt.</div>
+
+    <div class="grid">
+      <section class="card">
+        <div>
+          <div class="card-label">🔥 Meilleure réussite sur balle décisive</div>
+          <div id="clutchRanking" class="ranking-list">—</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div>
+          <div class="card-label">⚡ Plus longue série de buts</div>
+          <div id="streakRanking" class="ranking-list">—</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div>
+          <div class="card-label">🛡️ Moins de buts concédés sur un match</div>
+          <div id="defenseRanking" class="ranking-list">—</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div>
+          <div class="card-label">🎯 Meilleur pourcentage de but après engagement</div>
+          <div id="engagementRanking" class="ranking-list">—</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div>
+          <div class="card-label">🚀 Meilleur pourcentage de but après engagement adverse</div>
+          <div id="reengagementRanking" class="ranking-list">—</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div>
+          <div class="card-label">🏆 Meilleur ratio manches jouées / manches gagnées</div>
+          <div id="setsRatioRanking" class="ranking-list">—</div>
+        </div>
+      </section>
+    </div>
+
+    <div id="meta" class="meta">Aucune donnée chargée.</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+    // Remplace toutes les valeurs par celles de ton projet Firebase.
+    const firebaseConfig = {
+      apiKey: 'REMPLACE_PAR_API_KEY',
+      authDomain: 'REMPLACE_PAR_AUTH_DOMAIN',
+      projectId: 'donnees-scoreboard',
+      storageBucket: 'REMPLACE_PAR_STORAGE_BUCKET',
+      messagingSenderId: 'REMPLACE_PAR_MESSAGING_SENDER_ID',
+      appId: 'REMPLACE_PAR_APP_ID'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const tournamentIdInput = document.getElementById('tournamentId');
+    const reloadBtn = document.getElementById('reloadBtn');
+    const statusEl = document.getElementById('status');
+    const metaEl = document.getElementById('meta');
+
+    const clutchRankingEl = document.getElementById('clutchRanking');
+    const streakRankingEl = document.getElementById('streakRanking');
+    const defenseRankingEl = document.getElementById('defenseRanking');
+    const engagementRankingEl = document.getElementById('engagementRanking');
+    const reengagementRankingEl = document.getElementById('reengagementRanking');
+    const setsRatioRankingEl = document.getElementById('setsRatioRanking');
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function safeNameFromTeam(match, team) {
+      if (team === 'A') return match.teamA?.name || match.teamAName || 'Joueur A';
+      if (team === 'B') return match.teamB?.name || match.teamBName || 'Joueur B';
+      return 'Inconnu';
+    }
+
+    async function getAllMatches(tournamentId) {
+      const categoriesRef = collection(db, 'tournaments', tournamentId, 'categories');
+      const categoriesSnap = await getDocs(categoriesRef);
+
+      const matches = [];
+
+      for (const catDoc of categoriesSnap.docs) {
+        const matchesRef = collection(db, 'tournaments', tournamentId, 'categories', catDoc.id, 'matches');
+        const matchesSnap = await getDocs(matchesRef);
+
+        for (const matchDoc of matchesSnap.docs) {
+          const matchData = matchDoc.data();
+          const goalsRef = collection(
+            db,
+            'tournaments',
+            tournamentId,
+            'categories',
+            catDoc.id,
+            'matches',
+            matchDoc.id,
+            'goals'
+          );
+          const goalsSnap = await getDocs(goalsRef);
+          const goals = goalsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+          matches.push({
+            id: matchDoc.id,
+            categoryId: catDoc.id,
+            ...matchData,
+            goals
+          });
+        }
+      }
+
+      return matches;
+    }
+
+    function getAllGoalsCount(matches) {
+      return matches.reduce((sum, match) => sum + (match.goals?.length || 0), 0);
+    }
+
+    function getDecisiveChancesForMatch(match) {
+      const goals = (match.goals || []).slice().sort((a, b) => {
+        const setA = Number(a?.setNumber ?? 1);
+        const setB = Number(b?.setNumber ?? 1);
+        if (setA !== setB) return setA - setB;
+
+        const aScore = Number(a?.scoreAAfter ?? 0) + Number(a?.scoreBAfter ?? 0);
+        const bScore = Number(b?.scoreAAfter ?? 0) + Number(b?.scoreBAfter ?? 0);
+        return aScore - bScore;
+      });
+
+      const chances = [];
+      let currentSet = null;
+      let scoreA = 0;
+      let scoreB = 0;
+
+      function hasDecisiveBall(setNumber, team, a, b) {
+        const isFifthSet = setNumber === 5;
+
+        if (!isFifthSet) {
+          return team === 'A' ? a === 4 : b === 4;
+        }
+
+        if (team === 'A') {
+          return a === 4 || (a >= 5 && a === b + 1) || (a === 7 && b === 7);
+        }
+
+        return b === 4 || (b >= 5 && b === a + 1) || (b === 7 && a === 7);
+      }
+
+      for (const goal of goals) {
+        const setNumber = Number(goal?.setNumber ?? 1);
+        const scoringTeam = goal?.team;
+        if (scoringTeam !== 'A' && scoringTeam !== 'B') continue;
+
+        if (setNumber !== currentSet) {
+          currentSet = setNumber;
+          scoreA = 0;
+          scoreB = 0;
+        }
+
+        const aHasDecisiveBall = hasDecisiveBall(setNumber, 'A', scoreA, scoreB);
+        const bHasDecisiveBall = hasDecisiveBall(setNumber, 'B', scoreA, scoreB);
+
+        if (aHasDecisiveBall) {
+          chances.push({
+            team: 'A',
+            success: scoringTeam === 'A',
+            beforeScoreA: scoreA,
+            beforeScoreB: scoreB,
+            setNumber
+          });
+        }
+
+        if (bHasDecisiveBall) {
+          chances.push({
+            team: 'B',
+            success: scoringTeam === 'B',
+            beforeScoreA: scoreA,
+            beforeScoreB: scoreB,
+            setNumber
+          });
+        }
+
+        scoreA = Number(goal.scoreAAfter ?? scoreA);
+        scoreB = Number(goal.scoreBAfter ?? scoreB);
+      }
+
+      return chances;
+    }
+
+    function getClutchPlayer(matches) {
+      const stats = {};
+
+      for (const match of matches) {
+        const chances = getDecisiveChancesForMatch(match);
+
+        for (const chance of chances) {
+          const player = safeNameFromTeam(match, chance.team);
+
+          if (!stats[player]) {
+            stats[player] = { attempts: 0, successes: 0 };
+          }
+
+          stats[player].attempts += 1;
+          if (chance.success) {
+            stats[player].successes += 1;
+          }
+        }
+      }
+
+      return Object.entries(stats)
+        .filter(([, values]) => values.attempts >= 5)
+        .map(([player, values]) => ({
+          player,
+          pct: values.successes / values.attempts,
+          successes: values.successes,
+          attempts: values.attempts
+        }))
+        .sort((a, b) => b.pct - a.pct || b.successes - a.successes || a.player.localeCompare(b.player, 'fr'))
+        .slice(0, 3);
+    }
+
+    function getLongestStreak(matches) {
+      const bestByPlayer = {};
+
+      for (const match of matches) {
+        let streakA = 0;
+        let streakB = 0;
+
+        for (const goal of (match.goals || [])) {
+          if (goal.team === 'A') {
+            streakA += 1;
+            streakB = 0;
+          } else if (goal.team === 'B') {
+            streakB += 1;
+            streakA = 0;
+          }
+
+          const playerA = safeNameFromTeam(match, 'A');
+          const playerB = safeNameFromTeam(match, 'B');
+          bestByPlayer[playerA] = Math.max(bestByPlayer[playerA] || 0, streakA);
+          bestByPlayer[playerB] = Math.max(bestByPlayer[playerB] || 0, streakB);
+        }
+      }
+
+      return Object.entries(bestByPlayer)
+        .map(([player, streak]) => ({ player, streak }))
+        .sort((a, b) => b.streak - a.streak || a.player.localeCompare(b.player, 'fr'))
+        .slice(0, 3);
+    }
+
+    function totalConcededByTeam(match, team) {
+      return (match.goals || []).filter(goal => goal.team !== team).length;
+    }
+
+    function getBestDefense(matches) {
+      const bestByPlayer = {};
+
+      for (const match of matches) {
+        const concededA = totalConcededByTeam(match, 'A');
+        const concededB = totalConcededByTeam(match, 'B');
+
+        const playerA = safeNameFromTeam(match, 'A');
+        const playerB = safeNameFromTeam(match, 'B');
+
+        if (!(playerA in bestByPlayer) || concededA < bestByPlayer[playerA]) {
+          bestByPlayer[playerA] = concededA;
+        }
+        if (!(playerB in bestByPlayer) || concededB < bestByPlayer[playerB]) {
+          bestByPlayer[playerB] = concededB;
+        }
+      }
+
+      return Object.entries(bestByPlayer)
+        .map(([player, conceded]) => ({ player, conceded }))
+        .sort((a, b) => a.conceded - b.conceded || a.player.localeCompare(b.player, 'fr'))
+        .slice(0, 3);
+    }
+
+    function getBestSetsRatio(matches) {
+      const stats = {};
+
+      for (const match of matches) {
+        const sets = match.sets || [];
+        const playerA = safeNameFromTeam(match, 'A');
+        const playerB = safeNameFromTeam(match, 'B');
+
+        if (!stats[playerA]) stats[playerA] = { played: 0, won: 0 };
+        if (!stats[playerB]) stats[playerB] = { played: 0, won: 0 };
+
+        for (const set of sets) {
+          const scoreA = Number(set?.a ?? 0);
+          const scoreB = Number(set?.b ?? 0);
+          if (!Number.isFinite(scoreA) || !Number.isFinite(scoreB)) continue;
+
+          stats[playerA].played += 1;
+          stats[playerB].played += 1;
+
+          if (scoreA > scoreB) stats[playerA].won += 1;
+          else if (scoreB > scoreA) stats[playerB].won += 1;
+        }
+      }
+
+      return Object.entries(stats)
+        .filter(([, values]) => values.played >= 15)
+        .map(([player, values]) => ({
+          player,
+          ratio: values.won / values.played,
+          won: values.won,
+          played: values.played
+        }))
+        .sort((a, b) => b.ratio - a.ratio || b.won - a.won || a.player.localeCompare(b.player, 'fr'))
+        .slice(0, 3);
+    }
+
+    function getBestAfterConcedingRate(matches) {
+      const stats = {};
+
+      for (const match of matches) {
+        const goals = match.goals || [];
+
+        for (let i = 1; i < goals.length; i += 1) {
+          const previousGoal = goals[i - 1];
+          const currentGoal = goals[i];
+
+          if (!previousGoal?.team || !currentGoal?.team) continue;
+
+          const responderTeam = previousGoal.team === 'A' ? 'B' : 'A';
+          const player = safeNameFromTeam(match, responderTeam);
+
+          if (!stats[player]) {
+            stats[player] = { successes: 0, opportunities: 0 };
+          }
+
+          stats[player].opportunities += 1;
+
+          if (currentGoal.team === responderTeam) {
+            stats[player].successes += 1;
+          }
+        }
+      }
+
+      return Object.entries(stats)
+        .filter(([, values]) => values.opportunities >= 1)
+        .map(([player, values]) => ({
+          player,
+          pct: values.successes / values.opportunities,
+          successes: values.successes,
+          opportunities: values.opportunities
+        }))
+        .sort((a, b) => b.pct - a.pct || b.successes - a.successes || a.player.localeCompare(b.player, 'fr'))
+        .slice(0, 3);
+    }
+
+    function getBestAfterOwnGoalRate(matches) {
+      const stats = {};
+
+      for (const match of matches) {
+        const goals = match.goals || [];
+
+        for (let i = 0; i < goals.length - 1; i += 1) {
+          const currentGoal = goals[i];
+          const nextGoal = goals[i + 1];
+
+          if (!currentGoal?.team || !nextGoal?.team) continue;
+
+          const sameScoringTeam = currentGoal.team;
+          const player = currentGoal.scorer || safeNameFromTeam(match, sameScoringTeam);
+
+          if (!stats[player]) {
+            stats[player] = { successes: 0, opportunities: 0 };
+          }
+
+          stats[player].opportunities += 1;
+
+          if (nextGoal.team === sameScoringTeam) {
+            stats[player].successes += 1;
+          }
+        }
+      }
+
+      return Object.entries(stats)
+        .filter(([, values]) => values.opportunities >= 5)
+        .map(([player, values]) => ({
+          player,
+          pct: values.successes / values.opportunities,
+          successes: values.successes,
+          opportunities: values.opportunities
+        }))
+        .sort((a, b) => b.pct - a.pct || b.successes - a.successes || a.player.localeCompare(b.player, 'fr'))
+        .slice(0, 3);
+    }
+
+    function renderRanking(el, items, formatter, emptyMessage) {
+      if (!items || items.length === 0) {
+        el.textContent = emptyMessage;
+        return;
+      }
+
+      el.innerHTML = items.map((item, index) => `
+        <div class="ranking-item">
+          <div class="ranking-left">
+            <div class="ranking-rank">${index + 1}.</div>
+            <div class="ranking-name">${item.player}</div>
+          </div>
+          <div class="ranking-stat">${formatter(item)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderEmpty(message = 'Aucune donnée.') {
+      clutchRankingEl.textContent = '—';
+      streakRankingEl.textContent = '—';
+      defenseRankingEl.textContent = '—';
+      engagementRankingEl.textContent = '—';
+      reengagementRankingEl.textContent = '—';
+      setsRatioRankingEl.textContent = '—';
+      metaEl.textContent = message;
+    }
+
+    function renderStats(matches, tournamentId) {
+      if (!matches.length) {
+        renderEmpty(`Aucun match trouvé pour le tournoi "${tournamentId}".`);
+        return;
+      }
+
+      const clutch = getClutchPlayer(matches);
+      const streak = getLongestStreak(matches);
+      const defense = getBestDefense(matches);
+      const engagement = getBestAfterConcedingRate(matches);
+      const reengagement = getBestAfterOwnGoalRate(matches);
+      const setsRatio = getBestSetsRatio(matches);
+      const categories = new Set(matches.map(m => m.categoryId)).size;
+      const goalsCount = getAllGoalsCount(matches);
+
+      renderRanking(
+        clutchRankingEl,
+        clutch,
+        item => `${(item.pct * 100).toFixed(0)} % (${item.successes}/${item.attempts})`,
+        'Minimum 5 essais requis'
+      );
+
+      renderRanking(
+        streakRankingEl,
+        streak,
+        item => `${item.streak} but(s)`,
+        'Aucune donnée'
+      );
+
+      renderRanking(
+        defenseRankingEl,
+        defense,
+        item => `${item.conceded} but(s) encaissé(s)`,
+        'Aucune donnée'
+      );
+
+      renderRanking(
+        engagementRankingEl,
+        engagement,
+        item => `${(item.pct * 100).toFixed(0)} % (${item.successes}/${item.opportunities})`,
+        'Aucune donnée'
+      );
+
+      renderRanking(
+        reengagementRankingEl,
+        reengagement,
+        item => `${(item.pct * 100).toFixed(0)} % (${item.successes}/${item.opportunities})`,
+        'Minimum 5 essais requis'
+      );
+
+      renderRanking(
+        setsRatioRankingEl,
+        setsRatio,
+        item => `${(item.ratio * 100).toFixed(0)} % (${item.won}/${item.played})`,
+        'Minimum 15 manches requises'
+      );
+
+      metaEl.textContent = `Tournoi : ${tournamentId} • ${matches.length} match(s) • ${categories} catégorie(s) • ${goalsCount} but(s) analysé(s)`;
+    }
+
+    async function loadRecap() {
+      const tournamentId = (tournamentIdInput.value || '').trim();
+      if (!tournamentId) {
+        renderEmpty('Renseigne un identifiant de tournoi.');
+        return;
+      }
+
+      setStatus('Chargement des matchs...');
+      try {
+        const matches = await getAllMatches(tournamentId);
+        console.log('MATCHES CHARGÉS', matches);
+        renderStats(matches, tournamentId);
+        setStatus('Chargement terminé.');
+      } catch (error) {
+        console.error(error);
+        renderEmpty(`Erreur : ${error.message}`);
+        setStatus('Erreur de chargement.');
+      }
+    }
+
+    reloadBtn.addEventListener('click', loadRecap);
+    loadRecap();
+  </script>
+</body>
+</html>
