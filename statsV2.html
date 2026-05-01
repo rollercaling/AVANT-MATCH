@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistiques Match | Baby Foot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./stats.css?v=7">
+</head>
+<body>
+  <main class="stats-page">
+    <div class="stats-background" aria-hidden="true">
+      <span class="stats-stripe stats-stripe-left"></span>
+      <span class="stats-stripe stats-stripe-right"></span>
+      <span class="stats-glow"></span>
+    </div>
+
+    <section class="stats-board" aria-label="Statistiques du match en cours">
+      <header class="match-meta-band">
+        <span id="tournamentName">TOURNOI</span>
+        <span class="meta-separator">-</span>
+        <span id="categoryName">CATEGORIE</span>
+        <span class="meta-separator">-</span>
+        <span id="roundLabel">TOUR</span>
+      </header>
+
+      <section class="players-band">
+        <div class="player-name player-name-left" id="leftPlayerName">JOUEUR 1</div>
+        <img class="stats-club-logo" src="./LOGO CLUB BLANC.png" alt="" aria-hidden="true">
+        <div class="player-name player-name-right" id="rightPlayerName">JOUEUR 2</div>
+      </section>
+
+      <section class="score-band">
+        <span id="currentSetLabel">MATCH EN COURS</span>
+        <strong id="scoreLine">0 - 0</strong>
+      </section>
+
+      <section class="stats-table">
+        <div class="stat-row stat-row-score">
+          <strong class="stat-value stat-left" id="leftScore">0</strong>
+          <span class="stat-label">Score</span>
+          <strong class="stat-value stat-right" id="rightScore">0</strong>
+        </div>
+
+        <div class="stat-row">
+          <strong class="stat-value stat-left" id="leftServeGoals">0/0 (0%)</strong>
+          <span class="stat-label">But Apr&egrave;s Engagement</span>
+          <strong class="stat-value stat-right" id="rightServeGoals">0/0 (0%)</strong>
+        </div>
+
+        <div class="stat-row">
+          <strong class="stat-value stat-left" id="leftBreakBalls">0/0 (0%)</strong>
+          <span class="stat-label">Balle de Manche</span>
+          <strong class="stat-value stat-right" id="rightBreakBalls">0/0 (0%)</strong>
+        </div>
+
+        <div class="stat-row">
+          <strong class="stat-value stat-left" id="leftLongestStreak">0</strong>
+          <span class="stat-label">Plus Longue S&eacute;rie de Buts</span>
+          <strong class="stat-value stat-right" id="rightLongestStreak">0</strong>
+        </div>
+
+        <div class="stat-row">
+          <strong class="stat-value stat-left" id="leftMatchBalls">0</strong>
+          <span class="stat-label">Nombre de Balle de Match</span>
+          <strong class="stat-value stat-right" id="rightMatchBalls">0</strong>
+        </div>
+      </section>
+
+      <footer class="stats-footer">
+        <span id="statsFooterLabel">COUPE DE FRANCE BABY FOOT</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="./stats.js?v=6" defer></script>
+</body>
+</html>
